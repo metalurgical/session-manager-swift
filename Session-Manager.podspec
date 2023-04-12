@@ -4,7 +4,7 @@ Pod::Spec.new do |spec|
   spec.ios.deployment_target  = "14.0"
   spec.summary      = "Manages session"
   spec.homepage     = "https://github.com/Web3Auth"
-  spec.license      = { :type => 'BSD', :file => 'License.md' }
+  spec.license      = { :type => 'MIT', :file => 'License.md' }
   spec.swift_version   = "5.0"
   spec.author       = { "Torus Labs" => "dhruv@tor.us" }
   spec.module_name = "SessionManager"
