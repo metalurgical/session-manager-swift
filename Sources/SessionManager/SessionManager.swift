@@ -9,7 +9,7 @@ import Foundation
 import OSLog
 import web3
 
-public class SessionManagement {
+public class SessionManager {
     
     private var sessionServerBaseUrl = "https://broadcast-server.tor.us/"
     private var sessionID:String? = nil

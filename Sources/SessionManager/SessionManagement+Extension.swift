@@ -9,7 +9,7 @@ import CryptoSwift
 import Foundation
 import secp256k1
 
-extension SessionManagement {
+extension SessionManager {
     func decryptData<T:Decodable>(privKeyHex: String, d: String) throws -> T {
         let ecies = try encParamsHexToBuf(encParamsHex: d)
         let result = try decrypt(privateKey: privKeyHex, opts: ecies)
@@ -139,7 +139,7 @@ extension SessionManagement {
     }
 }
 
-extension SessionManagement{
+extension SessionManager{
     
     func dictionaryToStruct<T:Decodable>(_ dictionary: [String: Any]) -> T? {
         guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: []),

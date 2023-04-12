@@ -20,7 +20,7 @@ final class SessionManagementTest: XCTestCase {
     
     func test_createSessionID() async{
         do{
-            let session = SessionManagement()
+            let session = SessionManager()
             let (privKey,pubKey) = generatePrivateandPublicKey()
             let sfa = SFAModel(publicKey: pubKey, privateKey: privKey)
             let result = try await session.createSession(data: sfa)
@@ -33,7 +33,7 @@ final class SessionManagementTest: XCTestCase {
     }
     
     func test_authoriseSessionID() async {
-        let session = SessionManagement(sessionID: sessionID)
+        let session = SessionManager(sessionID: sessionID)
         do{
             let sfa:SFAModel = try await session.authorizeSession()
             print(sfa)
@@ -44,7 +44,7 @@ final class SessionManagementTest: XCTestCase {
     }
     
     func test_invalidateSession() async{
-        let session = SessionManagement(sessionID: sessionID)
+        let session = SessionManager(sessionID: sessionID)
         do{
             let result = try await session.invalidateSession()
             print(result)
