@@ -24,7 +24,7 @@ public class SessionManager {
         self.sessionID = val
     }
     
-    init(sessionServerBaseUrl:String? = nil,sessionTime:Int = 86400,sessionID:String? = nil) {
+    public init(sessionServerBaseUrl:String? = nil,sessionTime:Int = 86400,sessionID:String? = nil) {
         if let sessionID = sessionID{
             self.sessionID = sessionID
             KeychainManager.shared.save(key: .sessionID, val: sessionID)
