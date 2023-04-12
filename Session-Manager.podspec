@@ -1,8 +1,8 @@
 Pod::Spec.new do |spec|
-  spec.name         = "Session-Manager"
+  spec.name         = "SessionManager"
   spec.version      = "1.0.0"
-  spec.ios.deployment_target  = "14.0"
-  spec.summary      = "Manages session"
+  spec.platform      = :ios, "14.0"
+  spec.summary      = "SessionManagement SDK"
   spec.homepage     = "https://github.com/Web3Auth"
   spec.license      = { :type => 'MIT', :file => 'License.md' }
   spec.swift_version   = "5.0"
