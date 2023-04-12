@@ -64,7 +64,7 @@ public class EthereumRPC {
 
     // Swift4 warning bug - https://bugs.swift.org/browse/SR-6265
     // static func execute<T: Encodable, U: Decodable>(session: URLSession, url: URL, method: String, params: T, receive: U.Type, id: Int = 1, completion: @escaping ((Error?, JSONRPCResult<U>?) -> Void)) -> Void {
-    public static func execute<T: Encodable, U: Decodable>(session: URLSession, url: URL, method: String, params: T, receive: U.Type, id: Int = 1, completion: @escaping ((Error?, Any?) -> Void)) -> Void {
+    public static func execute<T: Encodable, U: Decodable>(session: URLSession, url: URL, method: String, params: T, receive: U.Type, id: Int = 1, completion: @escaping ((Error?, Any?) -> Void)) {
 
         if type(of: params) == [Any].self {
             // If params are passed in with Array<Any> and not caught, runtime fatal error
@@ -89,7 +89,7 @@ public class EthereumRPC {
                 if let result = try? JSONDecoder().decode(JSONRPCResult<U>.self, from: data) {
                     return completion(nil, result.result)
                 } else if let result = try? JSONDecoder().decode([JSONRPCResult<U>].self, from: data) {
-                    let resultObjects = result.map{ return $0.result }
+                    let resultObjects = result.map { return $0.result }
                     return completion(nil, resultObjects)
                 } else if let errorResult = try? JSONDecoder().decode(JSONRPCErrorResult.self, from: data) {
                     print("Ethereum response error: \(errorResult.error)")

@@ -109,7 +109,7 @@ struct RecursiveLogCollector {
         let sem = DispatchSemaphore(value: 0)
         var responseValue: EthereumBlock?
 
-        self.ethClient.eth_blockNumber { (error, blockInt) in
+        self.ethClient.eth_blockNumber { (_, blockInt) in
             if let blockInt = blockInt {
                 responseValue = EthereumBlock(rawValue: blockInt)
             }

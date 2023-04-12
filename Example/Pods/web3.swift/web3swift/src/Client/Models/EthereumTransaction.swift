@@ -13,7 +13,7 @@ public protocol EthereumTransactionProtocol {
     init(from: EthereumAddress?, to: EthereumAddress, value: BigUInt?, data: Data?, nonce: Int?, gasPrice: BigUInt?, gasLimit: BigUInt?, chainId: Int?)
     init(from: EthereumAddress?, to: EthereumAddress, data: Data, gasPrice: BigUInt, gasLimit: BigUInt)
     init(to: EthereumAddress, data: Data)
-    
+
     var raw: Data? { get }
     var hash: Data? { get }
 }
@@ -34,7 +34,7 @@ public struct EthereumTransaction: EthereumTransactionProtocol, Equatable, Codab
             self.hash = self.raw?.web3.keccak256
         }
     }
-    
+
     public init(from: EthereumAddress?, to: EthereumAddress, value: BigUInt?, data: Data?, nonce: Int?, gasPrice: BigUInt?, gasLimit: BigUInt?, chainId: Int?) {
         self.from = from
         self.to = to
@@ -66,7 +66,7 @@ public struct EthereumTransaction: EthereumTransactionProtocol, Equatable, Codab
             gasLimit: gasLimit
         )
     }
-    
+
     public init(
         from: EthereumAddress?,
         to: EthereumAddress,
@@ -85,7 +85,7 @@ public struct EthereumTransaction: EthereumTransactionProtocol, Equatable, Codab
         self.blockNumber = nil
         self.hash = nil
     }
-    
+
     public init(to: EthereumAddress, data: Data) {
         self.from = nil
         self.to = to
@@ -97,14 +97,14 @@ public struct EthereumTransaction: EthereumTransactionProtocol, Equatable, Codab
         self.blockNumber = nil
         self.hash = nil
     }
-    
+
     public var raw: Data? {
         let txArray: [Any?] = [self.nonce, self.gasPrice, self.gasLimit, self.to.value.web3.noHexPrefix, self.value, self.data, self.chainId, 0, 0]
 
         return RLP.encode(txArray)
     }
-    
-    enum CodingKeys : String, CodingKey {
+
+    enum CodingKeys: String, CodingKey {
         case from
         case to
         case value
@@ -116,21 +116,21 @@ public struct EthereumTransaction: EthereumTransactionProtocol, Equatable, Codab
         case blockNumber
         case hash
     }
-    
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.to = try container.decode(EthereumAddress.self, forKey: .to)
         self.from = try? container.decode(EthereumAddress.self, forKey: .from)
         self.data = try? container.decode(Data.self, forKey: .data)
-        
+
         let decodeHexUInt = { (key: CodingKeys) -> BigUInt? in
             return (try? container.decode(String.self, forKey: key)).flatMap { BigUInt(hex: $0)}
         }
-        
+
         let decodeHexInt = { (key: CodingKeys) -> Int? in
             return (try? container.decode(String.self, forKey: key)).flatMap { Int(hex: $0)}
         }
-        
+
         self.value = decodeHexUInt(.value)
         self.gasLimit = decodeHexUInt(.gasLimit)
         self.gasPrice = decodeHexUInt(.gasPrice)
@@ -140,7 +140,7 @@ public struct EthereumTransaction: EthereumTransactionProtocol, Equatable, Codab
         self.hash = (try? container.decode(String.self, forKey: .hash))?.web3.hexData
         self.chainId = nil
     }
-    
+
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(to, forKey: .to)
@@ -161,20 +161,20 @@ public struct SignedTransaction {
     let v: Int
     let r: Data
     let s: Data
-    
+
     public init(transaction: EthereumTransaction, v: Int, r: Data, s: Data) {
         self.transaction = transaction
         self.v = v
         self.r = r.web3.strippingZeroesFromBytes
         self.s = s.web3.strippingZeroesFromBytes
     }
-    
+
     public var raw: Data? {
         let txArray: [Any?] = [transaction.nonce, transaction.gasPrice, transaction.gasLimit, transaction.to.value.web3.noHexPrefix, transaction.value, transaction.data, self.v, self.r, self.s]
 
         return RLP.encode(txArray)
     }
-    
+
     public var hash: Data? {
         return raw?.web3.keccak256
     }

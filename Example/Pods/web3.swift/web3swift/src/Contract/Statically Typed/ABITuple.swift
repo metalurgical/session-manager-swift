@@ -27,4 +27,3 @@ public protocol ABITupleEncodable {
 }
 
 public protocol ABITuple: ABIType, ABITupleEncodable, ABITupleDecodable {}
-

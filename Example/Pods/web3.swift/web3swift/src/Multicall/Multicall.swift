@@ -47,7 +47,6 @@ public struct Multicall {
     }
 }
 
-
 #if compiler(>=5.5) && canImport(_Concurrency)
 
 @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)

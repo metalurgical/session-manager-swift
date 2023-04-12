@@ -15,7 +15,6 @@ public extension ABIFunction {
             return completion(EthereumClientError.encodeIssue, nil)
         }
 
-
         client.eth_sendRawTransaction(tx, withAccount: account) { (error, res) in
             guard let res = res, error == nil else {
                 return completion(EthereumClientError.unexpectedReturnValue, nil)
@@ -50,7 +49,7 @@ public extension ABIFunction {
 
 @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
 public extension ABIFunction {
-    func execute(withClient client: EthereumClientProtocol, account: EthereumAccountProtocol) async throws -> String  {
+    func execute(withClient client: EthereumClientProtocol, account: EthereumAccountProtocol) async throws -> String {
         return try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<String, Error>) in
             execute(withClient: client, account: account) { error, response in
                 if let error = error {

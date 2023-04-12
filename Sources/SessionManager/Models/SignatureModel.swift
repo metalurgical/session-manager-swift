@@ -37,16 +37,3 @@ public struct ECIES: Codable {
     var ciphertext: String
     var mac: String
 }
-
-
-
-
-
-
-
-
-
-
-
-
-

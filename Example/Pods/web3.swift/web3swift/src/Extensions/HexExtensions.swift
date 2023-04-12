@@ -51,7 +51,7 @@ public extension Data {
 
 public extension Web3Extensions where Base == Data {
     var hexString: String {
-        let bytes = Array<UInt8>(base)
+        let bytes = [UInt8](base)
         return "0x" + bytes.map { String(format: "%02hhx", $0) }.joined()
     }
 }
@@ -70,28 +70,28 @@ public extension Web3Extensions where Base == String {
         }
         return base
     }
-    
+
     var withHexPrefix: String {
         if !base.hasPrefix("0x") {
             return "0x" + base
         }
         return base
     }
-    
+
     var stringValue: String {
         if let byteArray = try? HexUtil.byteArray(fromHex: base.web3.noHexPrefix), let str = String(bytes: byteArray, encoding: .utf8) {
             return str
         }
-        
+
         return base
     }
-    
+
     var hexData: Data? {
         let noHexPrefix = self.noHexPrefix
         if let bytes = try? HexUtil.byteArray(fromHex: noHexPrefix) {
             return Data( bytes)
         }
-        
+
         return nil
     }
 }

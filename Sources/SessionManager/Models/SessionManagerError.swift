@@ -10,8 +10,8 @@ public enum SessionManagerError: Error {
     case sessionIDAbsent
 }
 
-extension SessionManagerError:LocalizedError{
-    public var errorDescription: String?{
+extension SessionManagerError: LocalizedError {
+    public var errorDescription: String? {
         switch self {
         case .runtimeError(let msg):
             return msg

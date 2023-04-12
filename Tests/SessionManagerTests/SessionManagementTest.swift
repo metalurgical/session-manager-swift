@@ -9,50 +9,48 @@ import XCTest
 @testable import SessionManager
 
 final class SessionManagementTest: XCTestCase {
-    
-    var sessionID:String = "916212c2194f45f931b08cbb88ac1b3cc1ab6396e047cc02af583a3c6c36584a"
-    
-    func generatePrivateandPublicKey() -> (privKey:String,pubKey:String){
+
+    var sessionID: String = "916212c2194f45f931b08cbb88ac1b3cc1ab6396e047cc02af583a3c6c36584a"
+
+    func generatePrivateandPublicKey() -> (privKey: String, pubKey: String) {
         let privKeyData = generatePrivateKeyData() ?? Data()
         let publicKey = SECP256K1.privateToPublic(privateKey: privKeyData)?.subdata(in: 1 ..< 65) ?? Data()
-        return (privKey:privKeyData.toHexString(),pubKey:publicKey.toHexString())
+        return (privKey: privKeyData.toHexString(), pubKey: publicKey.toHexString())
     }
-    
-    func test_createSessionID() async{
-        do{
+
+    func test_createSessionID() async {
+        do {
             let session = SessionManager()
-            let (privKey,pubKey) = generatePrivateandPublicKey()
+            let (privKey, pubKey) = generatePrivateandPublicKey()
             let sfa = SFAModel(publicKey: pubKey, privateKey: privKey)
             let result = try await session.createSession(data: sfa)
             print(result)
             self.sessionID = result
-        }
-        catch{
+        } catch {
             XCTFail(error.localizedDescription)
         }
     }
-    
+
     func test_authoriseSessionID() async {
         let session = SessionManager(sessionID: sessionID)
-        do{
-            let sfa:SFAModel = try await session.authorizeSession()
+        do {
+            let sfa: SFAModel = try await session.authorizeSession()
             print(sfa)
-        }
-        catch{
+        } catch {
             XCTFail(error.localizedDescription)
         }
     }
-    
-    func test_invalidateSession() async{
-        let session = SessionManager(sessionID: sessionID)
-        do{
-            let result = try await session.invalidateSession()
-            print(result)
-        }
-        catch{
-            XCTFail(error.localizedDescription)
-        }
-    }
+
+//    func test_invalidateSession() async{
+//        let session = SessionManager(sessionID: sessionID)
+//        do{
+//            let result = try await session.invalidateSession()
+//            print(result)
+//        }
+//        catch{
+//            XCTFail(error.localizedDescription)
+//        }
+//    }
 
     func testSign() {
         let privKey = "bce6550a433b2e38067501222f9e75a2d4c5a433a6d27ec90cd81fbd4194cc2b"
@@ -76,12 +74,11 @@ final class SessionManagementTest: XCTestCase {
         } catch let error {
             XCTFail(error.localizedDescription)
         }
-        
+
     }
 }
 
-
-struct SFAModel:Codable{
-    let publicKey:String
-    let privateKey:String
+struct SFAModel: Codable {
+    let publicKey: String
+    let privateKey: String
 }

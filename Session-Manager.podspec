@@ -9,7 +9,7 @@ Pod::Spec.new do |spec|
   spec.author       = { "Torus Labs" => "dhruv@tor.us" }
   spec.module_name = "SessionManager"
   spec.source       = { :git => "https://github.com/Web3Auth/session-manager-swift.git", :tag => spec.version }
-  spec.source_files = "Sources/SessionManager/*.{swift,json}","Sources/SessionManager/**/*.{swift,json}"
+  spec.source_files = "Sources/SessionManager/*.{swift}","Sources/SessionManager/**/*.{swift}"
   spec.dependency 'KeychainSwift', '~> 20.0.0'
   spec.dependency 'web3.swift', '~> 0.9.3'
   spec.dependency 'CryptoSwift', '~> 1.5.1'

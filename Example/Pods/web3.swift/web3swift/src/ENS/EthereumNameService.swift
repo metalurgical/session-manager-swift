@@ -10,8 +10,8 @@ import Foundation
 
 protocol EthereumNameServiceProtocol {
     init(client: EthereumClientProtocol, registryAddress: EthereumAddress?)
-    func resolve(address: EthereumAddress, completion: @escaping((EthereumNameServiceError?, String?) -> Void)) -> Void
-    func resolve(ens: String, completion: @escaping((EthereumNameServiceError?, EthereumAddress?) -> Void)) -> Void
+    func resolve(address: EthereumAddress, completion: @escaping((EthereumNameServiceError?, String?) -> Void))
+    func resolve(ens: String, completion: @escaping((EthereumNameServiceError?, EthereumAddress?) -> Void))
 
 #if compiler(>=5.5) && canImport(_Concurrency)
     @available(macOS 10.15, iOS 13, watchOS 6, tvOS 13, *)
@@ -57,7 +57,7 @@ public class EthereumNameService: EthereumNameServiceProtocol {
             return
         }
 
-        client.eth_call(registryTransaction, block: .Latest, completion: { (error, resolverData) in
+        client.eth_call(registryTransaction, block: .Latest, completion: { (_, resolverData) in
             guard let resolverData = resolverData else {
                 return completion(EthereumNameServiceError.noResolver, nil)
             }
@@ -76,7 +76,7 @@ public class EthereumNameService: EthereumNameServiceProtocol {
                 return
             }
 
-            self.client.eth_call(addressTransaction, block: .Latest, completion: { (error, data) in
+            self.client.eth_call(addressTransaction, block: .Latest, completion: { (_, data) in
                 guard let data = data, data != "0x" else {
                     return completion(EthereumNameServiceError.ensUnknown, nil)
                 }
@@ -106,7 +106,7 @@ public class EthereumNameService: EthereumNameServiceProtocol {
             return
         }
 
-        client.eth_call(registryTransaction, block: .Latest, completion: { (error, resolverData) in
+        client.eth_call(registryTransaction, block: .Latest, completion: { (_, resolverData) in
             guard let resolverData = resolverData else {
                 return completion(EthereumNameServiceError.noResolver, nil)
             }
@@ -124,7 +124,7 @@ public class EthereumNameService: EthereumNameServiceProtocol {
                 return
             }
 
-            self.client.eth_call(addressTransaction, block: .Latest, completion: { (error, data) in
+            self.client.eth_call(addressTransaction, block: .Latest, completion: { (_, data) in
                 guard let data = data, data != "0x" else {
                     return completion(EthereumNameServiceError.ensUnknown, nil)
                 }

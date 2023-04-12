@@ -7,11 +7,11 @@
 
 import Foundation
 
-enum HTTPMethod{
+enum HTTPMethod {
     case get([URLQueryItem])
-    case post(T:Encodable)
-    
-    var name:String{
+    case post(T: Encodable)
+
+    var name: String {
         switch self {
         case .get:
             return "GET"
@@ -21,18 +21,18 @@ enum HTTPMethod{
     }
 }
 
-protocol NetworkManagerProtocol{
-    static var baseURL:String{get}
-    var path:String{get}
-    var httpMethod:HTTPMethod{get}
-    var headers:[String:String]{get}
+protocol NetworkManagerProtocol {
+    static var baseURL: String {get}
+    var path: String {get}
+    var httpMethod: HTTPMethod {get}
+    var headers: [String: String] {get}
 }
 
-enum NetworkingError:Error,LocalizedError{
+enum NetworkingError: Error, LocalizedError {
     case invalidURL
     case invalidResponse
     case decodingError
-    
+
     public var errorDescription: String? {
         switch self {
         case .invalidURL:

@@ -147,8 +147,8 @@ public class EthereumClient: EthereumClientProtocol {
     }
 
     public func net_version(completion: @escaping ((EthereumClientError?, EthereumNetwork?) -> Void)) {
-        let emptyParams: Array<Bool> = []
-        EthereumRPC.execute(session: session, url: url, method: "net_version", params: emptyParams, receive: String.self) { (error, response) in
+        let emptyParams: [Bool] = []
+        EthereumRPC.execute(session: session, url: url, method: "net_version", params: emptyParams, receive: String.self) { (_, response) in
             if let resString = response as? String {
                 let network = EthereumNetwork.fromString(resString)
                 completion(nil, network)
@@ -159,8 +159,8 @@ public class EthereumClient: EthereumClientProtocol {
     }
 
     public func eth_gasPrice(completion: @escaping ((EthereumClientError?, BigUInt?) -> Void)) {
-        let emptyParams: Array<Bool> = []
-        EthereumRPC.execute(session: session, url: url, method: "eth_gasPrice", params: emptyParams, receive: String.self) { (error, response) in
+        let emptyParams: [Bool] = []
+        EthereumRPC.execute(session: session, url: url, method: "eth_gasPrice", params: emptyParams, receive: String.self) { (_, response) in
             if let hexString = response as? String {
                 completion(nil, BigUInt(hex: hexString))
             } else {
@@ -170,8 +170,8 @@ public class EthereumClient: EthereumClientProtocol {
     }
 
     public func eth_blockNumber(completion: @escaping ((EthereumClientError?, Int?) -> Void)) {
-        let emptyParams: Array<Bool> = []
-        EthereumRPC.execute(session: session, url: url, method: "eth_blockNumber", params: emptyParams, receive: String.self) { (error, response) in
+        let emptyParams: [Bool] = []
+        EthereumRPC.execute(session: session, url: url, method: "eth_blockNumber", params: emptyParams, receive: String.self) { (_, response) in
             if let hexString = response as? String {
                 if let integerValue = Int(hex: hexString) {
                     completion(nil, integerValue)
@@ -185,7 +185,7 @@ public class EthereumClient: EthereumClientProtocol {
     }
 
     public func eth_getBalance(address: EthereumAddress, block: EthereumBlock, completion: @escaping ((EthereumClientError?, BigUInt?) -> Void)) {
-        EthereumRPC.execute(session: session, url: url, method: "eth_getBalance", params: [address.value, block.stringValue], receive: String.self) { (error, response) in
+        EthereumRPC.execute(session: session, url: url, method: "eth_getBalance", params: [address.value, block.stringValue], receive: String.self) { (_, response) in
             if let resString = response as? String, let balanceInt = BigUInt(hex: resString.web3.noHexPrefix) {
                 completion(nil, balanceInt)
             } else {
@@ -195,7 +195,7 @@ public class EthereumClient: EthereumClientProtocol {
     }
 
     public func eth_getCode(address: EthereumAddress, block: EthereumBlock = .Latest, completion: @escaping((EthereumClientError?, String?) -> Void)) {
-        EthereumRPC.execute(session: session, url: url, method: "eth_getCode", params: [address.value, block.stringValue], receive: String.self) { (error, response) in
+        EthereumRPC.execute(session: session, url: url, method: "eth_getCode", params: [address.value, block.stringValue], receive: String.self) { (_, response) in
             if let resDataString = response as? String {
                 completion(nil, resDataString)
             } else {
@@ -281,7 +281,7 @@ public class EthereumClient: EthereumClientProtocol {
             group.enter()
 
             // Inject pending nonce
-            self.eth_getTransactionCount(address: account.address, block: .Pending) { (error, count) in
+            self.eth_getTransactionCount(address: account.address, block: .Pending) { (_, count) in
                 guard let nonce = count else {
                     group.leave()
                     return completion(EthereumClientError.unexpectedReturnValue, nil)
@@ -299,7 +299,7 @@ public class EthereumClient: EthereumClientProtocol {
                     return completion(EthereumClientError.encodeIssue, nil)
                 }
 
-                EthereumRPC.execute(session: self.session, url: self.url, method: "eth_sendRawTransaction", params: [transactionHex], receive: String.self) { (error, response) in
+                EthereumRPC.execute(session: self.session, url: self.url, method: "eth_sendRawTransaction", params: [transactionHex], receive: String.self) { (_, response) in
                     group.leave()
                     if let resDataString = response as? String {
                         completion(nil, resDataString)
@@ -314,7 +314,7 @@ public class EthereumClient: EthereumClientProtocol {
     }
 
     public func eth_getTransactionCount(address: EthereumAddress, block: EthereumBlock, completion: @escaping ((EthereumClientError?, Int?) -> Void)) {
-        EthereumRPC.execute(session: session, url: url, method: "eth_getTransactionCount", params: [address.value, block.stringValue], receive: String.self) { (error, response) in
+        EthereumRPC.execute(session: session, url: url, method: "eth_getTransactionCount", params: [address.value, block.stringValue], receive: String.self) { (_, response) in
             if let resString = response as? String {
                 let count = Int(hex: resString)
                 completion(nil, count)
@@ -325,7 +325,7 @@ public class EthereumClient: EthereumClientProtocol {
     }
 
     public func eth_getTransactionReceipt(txHash: String, completion: @escaping ((EthereumClientError?, EthereumTransactionReceipt?) -> Void)) {
-        EthereumRPC.execute(session: session, url: url, method: "eth_getTransactionReceipt", params: [txHash], receive: EthereumTransactionReceipt.self) { (error, response) in
+        EthereumRPC.execute(session: session, url: url, method: "eth_getTransactionReceipt", params: [txHash], receive: EthereumTransactionReceipt.self) { (_, response) in
             if let receipt = response as? EthereumTransactionReceipt {
                 completion(nil, receipt)
             } else if let _ = response {
@@ -338,7 +338,7 @@ public class EthereumClient: EthereumClientProtocol {
 
     public func eth_getTransaction(byHash txHash: String, completion: @escaping((EthereumClientError?, EthereumTransaction?) -> Void)) {
 
-        EthereumRPC.execute(session: session, url: url, method: "eth_getTransactionByHash", params: [txHash], receive: EthereumTransaction.self) { (error, response) in
+        EthereumRPC.execute(session: session, url: url, method: "eth_getTransactionByHash", params: [txHash], receive: EthereumTransaction.self) { (_, response) in
             if let transaction = response as? EthereumTransaction {
                 completion(nil, transaction)
             } else {
@@ -455,7 +455,7 @@ public class EthereumClient: EthereumClientProtocol {
 
         let params = CallParams(block: block, fullTransactions: false)
 
-        EthereumRPC.execute(session: session, url: url, method: "eth_getBlockByNumber", params: params, receive: EthereumBlockInfo.self) { (error, response) in
+        EthereumRPC.execute(session: session, url: url, method: "eth_getBlockByNumber", params: params, receive: EthereumBlockInfo.self) { (_, response) in
             if let blockData = response as? EthereumBlockInfo {
                 completion(nil, blockData)
             } else {

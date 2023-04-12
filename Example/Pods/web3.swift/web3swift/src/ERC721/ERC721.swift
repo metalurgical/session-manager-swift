@@ -47,7 +47,7 @@ public class ERC721: ERC165 {
                          topics: [ sig, nil, String(hexFromBytes: result)],
                          fromBlock: fromBlock,
                          toBlock: toBlock,
-                         eventTypes: [ERC721Events.Transfer.self]) { (error, events, unprocessedLogs) in
+                         eventTypes: [ERC721Events.Transfer.self]) { (error, events, _) in
 
             if let events = events as? [ERC721Events.Transfer] {
                 return completion(error, events)
@@ -70,7 +70,7 @@ public class ERC721: ERC165 {
                          topics: [ sig, String(hexFromBytes: result)],
                          fromBlock: fromBlock,
                          toBlock: toBlock,
-                         eventTypes: [ERC721Events.Transfer.self]) { (error, events, unprocessedLogs) in
+                         eventTypes: [ERC721Events.Transfer.self]) { (error, events, _) in
 
             if let events = events as? [ERC721Events.Transfer] {
                 return completion(error, events)
@@ -245,7 +245,7 @@ public class ERC721Metadata: ERC721 {
 
             let baseURL = response
             let task = self?.session.dataTask(with: baseURL,
-                                              completionHandler: { (data, response, error) in
+                                              completionHandler: { (data, _, error) in
                 guard let data = data else {
                     return completion(error, nil)
                 }

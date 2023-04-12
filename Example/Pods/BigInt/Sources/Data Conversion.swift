@@ -9,7 +9,7 @@
 import Foundation
 
 extension BigUInt {
-    //MARK: NSData Conversion
+    // MARK: NSData Conversion
 
     public init(_ buffer: UnsafeRawBufferPointer) {
         // This assumes Word is binary.
@@ -41,7 +41,6 @@ extension BigUInt {
         }
         assert(c == 0 && word == 0 && index == -1)
     }
-
 
     /// Initializes an integer from the bits stored inside a piece of `Data`.
     /// The data is assumed to be in network (big-endian) byte order.
@@ -107,4 +106,3 @@ extension BigUInt {
         return data
     }
 }
-

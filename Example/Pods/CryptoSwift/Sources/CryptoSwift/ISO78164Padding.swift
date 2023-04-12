@@ -23,7 +23,7 @@ struct ISO78164Padding: PaddingProtocol {
   }
 
   @inlinable
-  func add(to bytes: Array<UInt8>, blockSize: Int) -> Array<UInt8> {
+  func add(to bytes: [UInt8], blockSize: Int) -> [UInt8] {
     var padded = Array(bytes)
     padded.append(0x80)
 
@@ -34,7 +34,7 @@ struct ISO78164Padding: PaddingProtocol {
   }
 
   @inlinable
-  func remove(from bytes: Array<UInt8>, blockSize _: Int?) -> Array<UInt8> {
+  func remove(from bytes: [UInt8], blockSize _: Int?) -> [UInt8] {
     if let idx = bytes.lastIndex(of: 0x80) {
       return Array(bytes[..<idx])
     } else {

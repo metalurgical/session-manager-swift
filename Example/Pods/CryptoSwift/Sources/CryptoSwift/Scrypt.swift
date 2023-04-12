@@ -43,7 +43,7 @@ public final class Scrypt {
   ///   - N: determines extra memory used
   ///   - r: determines a block size
   ///   - p: determines parallelicity degree
-  public init(password: Array<UInt8>, salt: Array<UInt8>, dkLen: Int, N: Int, r: Int, p: Int) throws {
+  public init(password: [UInt8], salt: [UInt8], dkLen: Int, N: Int, r: Int, p: Int) throws {
     precondition(dkLen > 0)
     precondition(N > 0)
     precondition(r > 0)

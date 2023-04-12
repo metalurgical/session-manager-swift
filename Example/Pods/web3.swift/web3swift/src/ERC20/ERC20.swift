@@ -96,7 +96,7 @@ public class ERC20: ERC20Protocol {
                               topics: [ sig, nil, String(hexFromBytes: result)],
                               fromBlock: fromBlock,
                               toBlock: toBlock,
-                              eventTypes: [ERC20Events.Transfer.self]) { (error, events, unprocessedLogs) in
+                              eventTypes: [ERC20Events.Transfer.self]) { (error, events, _) in
 
             if let events = events as? [ERC20Events.Transfer] {
                 return completion(error, events)
@@ -118,7 +118,7 @@ public class ERC20: ERC20Protocol {
                               topics: [ sig, String(hexFromBytes: result), nil ],
                               fromBlock: fromBlock,
                               toBlock: toBlock,
-                              eventTypes: [ERC20Events.Transfer.self]) { (error, events, unprocessedLogs) in
+                              eventTypes: [ERC20Events.Transfer.self]) { (error, events, _) in
 
             if let events = events as? [ERC20Events.Transfer] {
                 return completion(error, events)

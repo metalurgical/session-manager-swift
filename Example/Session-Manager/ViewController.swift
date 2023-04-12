@@ -10,30 +10,27 @@ import UIKit
 import SessionManager
 
 class ViewController: UIViewController {
-    var session:SessionManager!
-    let sessionID:String = "916212c2194f45f931b08cbb88ac1b3cc1ab6396e047cc02af583a3c6c36584a"
+
+    var session: SessionManager!
+    let sessionID: String = "916212c2194f45f931b08cbb88ac1b3cc1ab6396e047cc02af583a3c6c36584a"
 
     override func viewDidLoad() {
         super.viewDidLoad()
         session = SessionManager(sessionID: sessionID)
-        Task{
+        Task {
             await getSessionData()
         }
         // Do any additional setup after loading the view, typically from a nib.
     }
-    
-    
-    func getSessionData() async{
-        do{
-            let result:SFAModel = try await session.authorizeSession()
+
+    func getSessionData() async {
+        do {
+            let result: SFAModel = try await session.authorizeSession()
             print(result)
-        }
-        catch{
+        } catch {
             print(error)
         }
     }
-    
-    
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -42,9 +39,7 @@ class ViewController: UIViewController {
 
 }
 
-
-
-struct SFAModel:Codable{
-    let publicKey:String
-    let privateKey:String
+struct SFAModel: Codable {
+    let publicKey: String
+    let privateKey: String
 }
