@@ -12,7 +12,13 @@ import web3
 public class SessionManager {
 
     private var sessionServerBaseUrl = "https://broadcast-server.tor.us/"
-    private var sessionID: String?
+    private var sessionID: String?{
+        didSet{
+            if let sessionID = sessionID{
+                KeychainManager.shared.save(key: .sessionID, val: sessionID)
+            }
+        }
+    }
     private let sessionNamespace: String = ""
     private let sessionTime: Int
 
@@ -27,7 +33,6 @@ public class SessionManager {
     public init(sessionServerBaseUrl: String? = nil, sessionTime: Int = 86400, sessionID: String? = nil) {
         if let sessionID = sessionID {
             self.sessionID = sessionID
-            KeychainManager.shared.save(key: .sessionID, val: sessionID)
         } else {
             if let sessionID = KeychainManager.shared.get(key: .sessionID) {
                 self.sessionID = sessionID

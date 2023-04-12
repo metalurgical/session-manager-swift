@@ -59,7 +59,6 @@ class Service {
                 request.httpBody = data
             }
             let (data, response) = try await URLSession.shared.data(for: request)
-
             guard let response = response as? HTTPURLResponse, response.statusCode >= 200 && response.statusCode <= 299 else { throw NetworkingError.invalidResponse  }
             return .success(data)
         } catch let error {
