@@ -1,5 +1,14 @@
 import Foundation
 
+
+public func dictionaryToStruct<T: Decodable>(_ dictionary: [String: Any]) -> T? {
+    guard let jsonData = try? JSONSerialization.data(withJSONObject: dictionary, options: []),
+          let structObject = try? JSONDecoder().decode(T.self, from: jsonData) else {
+        return nil
+    }
+    return structObject
+}
+
 public func generatePrivateKeyData() -> Data? {
     return Data.randomOfLength(32)
 }
