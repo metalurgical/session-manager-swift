@@ -54,7 +54,6 @@ func data(from url: URL) async throws -> (Data, URLResponse) {
                  let error = error ?? URLError(.badServerResponse)
                  return continuation.resume(throwing: error)
              }
-
              continuation.resume(returning: (data, response))
          }
          task.resume()
