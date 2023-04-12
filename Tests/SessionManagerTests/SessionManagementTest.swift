@@ -10,7 +10,7 @@ import XCTest
 
 final class SessionManagementTest: XCTestCase {
     
-    var sessionID:String = "fa806dc756d3f420ea4a23362ab5b5fd1671965e1b5344bfecc33b08b7dcd7a0"
+    var sessionID:String = "77cfaccd38f3c8ef5a667f4b69183475a56f609b6eb5fa0606f17cf6a03b8ef6"
     
     func generatePrivateandPublicKey() -> (privKey:String,pubKey:String){
         let privKeyData = generatePrivateKeyData() ?? Data()
