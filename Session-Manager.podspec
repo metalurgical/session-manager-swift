@@ -1,5 +1,5 @@
 Pod::Spec.new do |spec|
-  spec.name         = "SessionManager"
+  spec.name         = "Session-Manager"
   spec.version      = "1.0.0"
   spec.platform      = :ios, "14.0"
   spec.summary      = "SessionManagement SDK"
