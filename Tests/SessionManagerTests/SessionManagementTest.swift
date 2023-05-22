@@ -41,16 +41,6 @@ final class SessionManagementTest: XCTestCase {
         }
     }
 
-//    func test_invalidateSession() async{
-//        let session = SessionManager(sessionID: sessionID)
-//        do{
-//            let result = try await session.invalidateSession()
-//            print(result)
-//        }
-//        catch{
-//            XCTFail(error.localizedDescription)
-//        }
-//    }
 
     func testSign() {
         let privKey = "bce6550a433b2e38067501222f9e75a2d4c5a433a6d27ec90cd81fbd4194cc2b"
@@ -75,6 +65,17 @@ final class SessionManagementTest: XCTestCase {
             XCTFail(error.localizedDescription)
         }
 
+    }
+    
+    func test_invalidateSession() async{
+        let session = SessionManager(sessionID: sessionID)
+        do{
+            let result = try await session.invalidateSession()
+            print(result)
+        }
+        catch{
+            XCTFail(error.localizedDescription)
+        }
     }
 }
 
