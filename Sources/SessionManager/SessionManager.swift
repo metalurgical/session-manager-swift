@@ -12,9 +12,9 @@ import web3
 public class SessionManager {
 
     private var sessionServerBaseUrl = "https://broadcast-server.tor.us/"
-    private var sessionID: String?{
-        didSet{
-            if let sessionID = sessionID{
+    private var sessionID: String? {
+        didSet {
+            if let sessionID = sessionID {
                 KeychainManager.shared.save(key: .sessionID, val: sessionID)
             }
         }
