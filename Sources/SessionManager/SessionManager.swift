@@ -96,7 +96,7 @@ public class SessionManager {
             do {
                 let msgDict = try JSONSerialization.jsonObject(with: data) as? [String: String]
                 let msgData = msgDict?["message"]
-                os_log("authrorize session response is: %@", log: getTorusLogger(log: Web3AuthLogger.network,
+                os_log("authorize session response is: %@", log: getTorusLogger(log: Web3AuthLogger.network,
                 type: .info), type: .info, "\(String(describing: msgDict))")
                 let loginDetails: T = try self.decryptData(privKeyHex: sessionID, dataToDecrypt: msgData ?? "")
                 KeychainManager.shared.save(key: .sessionID, val: sessionID)
