@@ -19,11 +19,11 @@ extension SessionManager {
         return dict
     }
 
-    func encryptData(privkeyHex: String, _ d: String) throws -> String {
+    func encryptData(privkeyHex: String, _ dataToEncrypt: String) throws -> String {
         guard let pubKey = SECP256K1.privateToPublic(privateKey: privkeyHex.hexa.data)?.web3.hexString.web3.noHexPrefix else {
             throw SessionManagerError.runtimeError("Invalid private key hex")
         }
-        let encParams = try encrypt(publicKey: pubKey, msg: d, opts: nil)
+        let encParams = try encrypt(publicKey: pubKey, msg: dataToEncrypt, opts: nil)
         let data = try JSONEncoder().encode(encParams)
         guard let string = String(data: data, encoding: .utf8) else { throw SessionManagerError.runtimeError("Invalid String from enc Params") }
         return string
@@ -98,7 +98,8 @@ extension SessionManager {
             dataToMac.append(contentsOf: [UInt8](ephemPublicKey.data))
             dataToMac.append(contentsOf: [UInt8](ciphertext.data))
             let mac = try? HMAC(key: macKey, variant: .sha2(.sha256)).authenticate(dataToMac)
-            return .init(iv: iv.toHexString(), ephemPublicKey: ephemPublicKey.toHexString(), ciphertext: ciphertext.toHexString(), mac: mac?.toHexString() ?? "")
+            return .init(iv: iv.toHexString(), ephemPublicKey: ephemPublicKey.toHexString(),
+            ciphertext: ciphertext.toHexString(), mac: mac?.toHexString() ?? "")
         } catch let err {
             throw err
         }
@@ -126,10 +127,10 @@ extension SessionManager {
         let iv = opts.iv.hexa
         let newXValue = reversedSharedSecret.hexa
         let hash = SHA2(variant: .sha512).calculate(for: newXValue.hexa).hexa
-        let AesEncryptionKey = hash.prefix(64)
+        let aesEncryptionKey = hash.prefix(64)
         do {
             // AES-CBCblock-256
-            let aes = try AES(key: AesEncryptionKey.hexa, blockMode: CBC(iv: iv), padding: .pkcs7)
+            let aes = try AES(key: aesEncryptionKey.hexa, blockMode: CBC(iv: iv), padding: .pkcs7)
             let decrypt = try aes.decrypt(opts.ciphertext.hexa)
             let data = Data(decrypt)
             result = String(data: data, encoding: .utf8) ?? ""

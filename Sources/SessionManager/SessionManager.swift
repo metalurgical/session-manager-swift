@@ -12,9 +12,9 @@ import web3
 public class SessionManager {
 
     private var sessionServerBaseUrl = "https://broadcast-server.tor.us/"
-    private var sessionID: String?{
-        didSet{
-            if let sessionID = sessionID{
+    private var sessionID: String? {
+        didSet {
+            if let sessionID = sessionID {
                 KeychainManager.shared.save(key: .sessionID, val: sessionID)
             }
         }
@@ -57,7 +57,9 @@ public class SessionManager {
                guard let sessionID = generateRandomSessionID() else {throw SessionManagerError.sessionIDAbsent}
                 self.sessionID = sessionID
                 let privKey = sessionID.hexa
-                guard let publicKeyHex = SECP256K1.privateToPublic(privateKey: sessionID.hexa.data, compressed: false)?.web3.hexString.web3.noHexPrefix else { throw SessionManagerError.runtimeError("Invalid Session ID") }
+                guard let publicKeyHex = SECP256K1.privateToPublic(privateKey: sessionID.hexa.data,
+                compressed: false)?.web3.hexString.web3.noHexPrefix
+                else { throw SessionManagerError.runtimeError("Invalid Session ID") }
                let encodedObj = try JSONEncoder().encode(data)
                let jsonString = String(data: encodedObj, encoding: .utf8) ?? ""
                let encData = try encryptData(privkeyHex: sessionID, jsonString)
@@ -85,7 +87,8 @@ public class SessionManager {
         guard let sessionID = sessionID else {
             throw SessionManagerError.sessionIDAbsent
         }
-        guard let publicKeyHex = SECP256K1.privateToPublic(privateKey: sessionID.hexa.data, compressed: false)?.web3.hexString.web3.noHexPrefix else { throw SessionManagerError.runtimeError("Invalid Session ID") }
+        guard let publicKeyHex = SECP256K1.privateToPublic(privateKey: sessionID.hexa.data, compressed: false)?.web3.hexString.web3.noHexPrefix
+        else { throw SessionManagerError.runtimeError("Invalid Session ID") }
         let api = Router.get([.init(name: "key", value: "\(publicKeyHex)"), .init(name: "namespace", value: sessionNamespace)])
         let result = await Service.request(router: api)
         switch result {
@@ -105,13 +108,14 @@ public class SessionManager {
         }
     }
 
-    public func invalidateSession()async throws  -> Bool {
+    public func invalidateSession() async throws -> Bool {
         guard let sessionID = sessionID else {
             throw SessionManagerError.sessionIDAbsent
         }
         do {
             let privKey = sessionID.hexa
-            guard let publicKeyHex = SECP256K1.privateToPublic(privateKey: sessionID.hexa.data, compressed: false)?.web3.hexString.web3.noHexPrefix else { throw SessionManagerError.runtimeError("Invalid Session ID") }
+            guard let publicKeyHex = SECP256K1.privateToPublic(privateKey: sessionID.hexa.data, compressed: false)?.web3.hexString.web3.noHexPrefix
+            else { throw SessionManagerError.runtimeError("Invalid Session ID") }
             let encData = try encryptData(privkeyHex: sessionID, "")
             let sig = try SECP256K1().sign(privkey: privKey.toHexString(), messageData: encData)
             let sigData = try JSONEncoder().encode(sig)

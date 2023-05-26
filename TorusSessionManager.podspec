@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
-  spec.name         = "Session-Manager"
-  spec.version      = "1.0.0"
+  spec.name         = "TorusSessionManager"
+  spec.version      = "1.0.1"
   spec.platform      = :ios, "14.0"
   spec.summary      = "SessionManagement SDK"
   spec.homepage     = "https://github.com/Web3Auth"
