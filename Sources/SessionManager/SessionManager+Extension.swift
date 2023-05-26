@@ -10,12 +10,13 @@ import Foundation
 import secp256k1
 
 extension SessionManager {
-    func decryptData<T: Decodable>(privKeyHex: String, d: String) throws -> T {
+    func decryptData(privKeyHex: String, d: String) throws -> [String:Any] {
         let ecies = try encParamsHexToBuf(encParamsHex: d)
         let result = try decrypt(privateKey: privKeyHex, opts: ecies)
-        guard let dict = try JSONSerialization.jsonObject(with: result.data(using: .utf8) ?? Data()) as? [String: Any],
-              let loginDetails: T = dictionaryToStruct(dict) else { throw SessionManagerError.decodingError }
-        return loginDetails
+        guard let dict = try JSONSerialization.jsonObject(with: result.data(using: .utf8) ?? Data()) as? [String: Any] else{ throw SessionManagerError.decodingError}
+//              let loginDetails: T = dictionaryToStruct(dict) else { throw SessionManagerError.decodingError }
+//        return loginDetails
+        return dict
     }
 
     func encryptData(privkeyHex: String, _ d: String) throws -> String {

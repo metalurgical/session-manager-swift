@@ -34,7 +34,7 @@ final class SessionManagementTest: XCTestCase {
     func test_authoriseSessionID() async {
         let session = SessionManager(sessionID: sessionID)
         do {
-            let sfa: SFAModel = try await session.authorizeSession()
+            let sfa = try await session.authorizeSession()
             print(sfa)
         } catch {
             XCTFail(error.localizedDescription)

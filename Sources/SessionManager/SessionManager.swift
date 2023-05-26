@@ -81,7 +81,7 @@ public class SessionManager {
 
     }
 
-    public func authorizeSession<T: Decodable>() async throws -> T {
+    public func authorizeSession() async throws -> [String:Any] {
         guard let sessionID = sessionID else {
             throw SessionManagerError.sessionIDAbsent
         }
@@ -94,7 +94,7 @@ public class SessionManager {
                 let msgDict = try JSONSerialization.jsonObject(with: data) as? [String: String]
                 let msgData = msgDict?["message"]
                 os_log("authrorize session response is: %@", log: getTorusLogger(log: Web3AuthLogger.network, type: .info), type: .info, "\(String(describing: msgDict))")
-                let loginDetails: T = try self.decryptData(privKeyHex: sessionID, d: msgData ?? "")
+                let loginDetails = try self.decryptData(privKeyHex: sessionID, d: msgData ?? "")
                 KeychainManager.shared.save(key: .sessionID, val: sessionID)
                 return loginDetails
             } catch {
