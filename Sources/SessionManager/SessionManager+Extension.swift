@@ -128,7 +128,20 @@ extension SessionManager {
         let newXValue = reversedSharedSecret.hexa
         let hash = SHA2(variant: .sha512).calculate(for: newXValue.hexa).hexa
         let aesEncryptionKey = hash.prefix(64)
+        
+        let _sharedSecretPrefix = Array(tupleToArray(sharedSecretData).prefix(32))
+        let _reversedSharedSecret = _sharedSecretPrefix.uint8Reverse()
+        let _hash = SHA2(variant: .sha512).calculate(for: Array(_reversedSharedSecret))
+        let macKey = Array(_hash.suffix(32))
+        var dataToMac: [UInt8] = opts.iv.hexa
+        dataToMac.append(contentsOf: [UInt8](opts.ephemPublicKey.hexa))
+        dataToMac.append(contentsOf: [UInt8](opts.ciphertext.hexa))
         do {
+            let macGood = try? HMAC(key: macKey, variant: .sha2(.sha256)).authenticate(dataToMac)
+            let macData = opts.mac.hexa
+            if macGood != macData {
+                throw SessionManagerError.runtimeError("Bad MAC error during decrypt")
+            }
             // AES-CBCblock-256
             let aes = try AES(key: aesEncryptionKey.hexa, blockMode: CBC(iv: iv), padding: .pkcs7)
             let decrypt = try aes.decrypt(opts.ciphertext.hexa)

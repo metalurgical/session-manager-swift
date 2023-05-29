@@ -10,7 +10,7 @@ import XCTest
 
 final class SessionManagementTest: XCTestCase {
 
-    var sessionID: String = "02666153283f10e9323e8e296032534d54314bc3296f2a3c47c9130346cc0dab"
+    var sessionID: String = "4b00111d33a3b8e4fbe29fcb8e4493e3985dda96cf618eee68aebc0ad9309e1c"
 
     func generatePrivateandPublicKey() -> (privKey: String, pubKey: String) {
         let privKeyData = generatePrivateKeyData() ?? Data()
@@ -24,7 +24,7 @@ final class SessionManagementTest: XCTestCase {
             let (privKey, pubKey) = generatePrivateandPublicKey()
             let sfa = SFAModel(publicKey: pubKey, privateKey: privKey)
             let result = try await session.createSession(data: sfa)
-            print(result)
+            print("SessionId: ", result)
             self.sessionID = result
         } catch {
             XCTFail(error.localizedDescription)
