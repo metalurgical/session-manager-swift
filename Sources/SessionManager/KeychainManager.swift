@@ -32,7 +32,7 @@ protocol KeychainManagerProtocol {
 public class KeychainManager: KeychainManagerProtocol {
     private let keychain = KeychainSwift()
     public static let shared = KeychainManager()
-    public var getAllKeys:[String]{
+    public var getAllKeys: [String] {
         return keychain.allKeys
     }
 

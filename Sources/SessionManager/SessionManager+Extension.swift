@@ -10,10 +10,10 @@ import Foundation
 import secp256k1
 
 extension SessionManager {
-    func decryptData(privKeyHex: String, d: String) throws -> [String:Any] {
+    func decryptData(privKeyHex: String, d: String) throws -> [String: Any] {
         let ecies = try encParamsHexToBuf(encParamsHex: d)
         let result = try decrypt(privateKey: privKeyHex, opts: ecies)
-        guard let dict = try JSONSerialization.jsonObject(with: result.data(using: .utf8) ?? Data()) as? [String: Any] else{ throw SessionManagerError.decodingError}
+        guard let dict = try JSONSerialization.jsonObject(with: result.data(using: .utf8) ?? Data()) as? [String: Any] else { throw SessionManagerError.decodingError}
 //              let loginDetails: T = dictionaryToStruct(dict) else { throw SessionManagerError.decodingError }
 //        return loginDetails
         return dict

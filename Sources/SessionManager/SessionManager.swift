@@ -83,7 +83,7 @@ public class SessionManager {
 
     }
 
-    public func authorizeSession() async throws -> [String:Any] {
+    public func authorizeSession() async throws -> [String: Any] {
         guard let sessionID = sessionID else {
             throw SessionManagerError.sessionIDAbsent
         }
