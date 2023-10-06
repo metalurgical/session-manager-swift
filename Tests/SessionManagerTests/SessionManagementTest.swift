@@ -40,6 +40,17 @@ final class SessionManagementTest: XCTestCase {
             XCTFail(error.localizedDescription)
         }
     }
+    
+    func testEncryptDecryptData() throws {
+        let session = SessionManager()
+        let privKey = "dda863b615ac6de27fb680b5563db3c19176a6f42cc1dee1768e220983385e3e"
+        let dt = ["data" : "data"]
+        let dataToEncrypt = try JSONSerialization.data(withJSONObject: dt)
+        let dataToEncryptStr = String(data: dataToEncrypt, encoding: .utf8)!
+        let encryptdata = try session.encryptData(privkeyHex: privKey, dataToEncryptStr)
+        let decrypted = try session.decryptData(privKeyHex: privKey, d: encryptdata)
+        print(decrypted)
+    }
 
     func testSign() {
         let privKey = "bce6550a433b2e38067501222f9e75a2d4c5a433a6d27ec90cd81fbd4194cc2b"
