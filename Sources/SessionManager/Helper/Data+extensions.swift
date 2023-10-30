@@ -4,7 +4,6 @@
 //
 //  Created by Michael Lee on 8/3/2022.
 //
-
 import Foundation
 
 extension Data {

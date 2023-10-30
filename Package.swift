@@ -5,16 +5,16 @@ import PackageDescription
 
 let package = Package(
     name: "SessionManager",
-    platforms: [.iOS(.v14)],
+    platforms: [.iOS(.v14), .macOS(.v11)],
     products: [
         .library(
             name: "SessionManager",
             targets: ["SessionManager"])
     ],
     dependencies: [
-         .package(name: "KeychainSwift", url: "https://github.com/evgenyneu/keychain-swift.git", from: "20.0.0"),
-        .package(name: "web3.swift", url: "https://github.com/argentlabs/web3.swift", from: "0.9.3"),
-        .package(name: "CryptoSwift", url: "https://github.com/krzyzanowskim/CryptoSwift.git", from: "1.5.1")
+        .package(name: "KeychainSwift", url: "https://github.com/evgenyneu/keychain-swift.git", from: "20.0.0"),
+        .package(name: "web3.swift", url: "https://github.com/argentlabs/web3.swift", from: "1.6.0"),
+        .package(name: "CryptoSwift", url: "https://github.com/krzyzanowskim/CryptoSwift.git", from: "1.8.0")
     ],
     targets: [
         .target(
