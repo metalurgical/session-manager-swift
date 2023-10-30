@@ -10,7 +10,7 @@ import XCTest
 
 final class SessionManagementTest: XCTestCase {
 
-    var sessionID: String = "02666153283f10e9323e8e296032534d54314bc3296f2a3c47c9130346cc0dab"
+    var sessionID: String = "ab6fb847033ccb155769bcd1193d0da2096fb3419193725e5a48b7d40e65caa3"
 
     func generatePrivateandPublicKey() -> (privKey: String, pubKey: String) {
         let privKeyData = generatePrivateKeyData() ?? Data()
@@ -24,7 +24,7 @@ final class SessionManagementTest: XCTestCase {
             let (privKey, pubKey) = generatePrivateandPublicKey()
             let sfa = SFAModel(publicKey: pubKey, privateKey: privKey)
             let result = try await session.createSession(data: sfa)
-            print(result)
+            print("SessionId: ", result)
             self.sessionID = result
         } catch {
             XCTFail(error.localizedDescription)
@@ -39,6 +39,17 @@ final class SessionManagementTest: XCTestCase {
         } catch {
             XCTFail(error.localizedDescription)
         }
+    }
+    
+    func testEncryptDecryptData() throws {
+        let session = SessionManager()
+        let privKey = "dda863b615ac6de27fb680b5563db3c19176a6f42cc1dee1768e220983385e3e"
+        let dt = ["data" : "data"]
+        let dataToEncrypt = try JSONSerialization.data(withJSONObject: dt)
+        let dataToEncryptStr = String(data: dataToEncrypt, encoding: .utf8)!
+        let encryptdata = try session.encryptData(privkeyHex: privKey, dataToEncryptStr)
+        let decrypted = try session.decryptData(privKeyHex: privKey, d: encryptdata)
+        print(decrypted)
     }
 
     func testSign() {

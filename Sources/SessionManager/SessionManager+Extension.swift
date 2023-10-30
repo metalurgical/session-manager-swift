@@ -122,15 +122,23 @@ extension SessionManager {
             throw SessionManagerError.runtimeError("ECDH Error")
         }
         let sharedSecretData = sharedSecret.data
-        let sharedSecretPrefix = tupleToArray(sharedSecretData).prefix(32)
-        let reversedSharedSecret = sharedSecretPrefix.reversed()
+        let sharedSecretPrefix = Array(tupleToArray(sharedSecretData).prefix(32))
+        let reversedSharedSecret = sharedSecretPrefix.uint8Reverse()
+        let hash = SHA2(variant: .sha512).calculate(for: Array(reversedSharedSecret))
+        let aesEncryptionKey = Array(hash.prefix(32))
         let iv = opts.iv.hexa
-        let newXValue = reversedSharedSecret.hexa
-        let hash = SHA2(variant: .sha512).calculate(for: newXValue.hexa).hexa
-        let aesEncryptionKey = hash.prefix(64)
+        let macKey = Array(hash.suffix(32))
+        var dataToMac: [UInt8] = opts.iv.hexa
+        dataToMac.append(contentsOf: [UInt8](opts.ephemPublicKey.hexa))
+        dataToMac.append(contentsOf: [UInt8](opts.ciphertext.hexa))
         do {
+            let macGood = try? HMAC(key: macKey, variant: .sha2(.sha256)).authenticate(dataToMac)
+            let macData = opts.mac.hexa
+            if macGood != macData {
+                throw SessionManagerError.runtimeError("Bad MAC error during decrypt")
+            }
             // AES-CBCblock-256
-            let aes = try AES(key: aesEncryptionKey.hexa, blockMode: CBC(iv: iv), padding: .pkcs7)
+            let aes = try AES(key: aesEncryptionKey, blockMode: CBC(iv: iv), padding: .pkcs7)
             let decrypt = try aes.decrypt(opts.ciphertext.hexa)
             let data = Data(decrypt)
             result = String(data: data, encoding: .utf8) ?? ""
