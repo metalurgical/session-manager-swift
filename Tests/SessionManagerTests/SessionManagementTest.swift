@@ -32,10 +32,13 @@ final class SessionManagementTest: XCTestCase {
     }
 
     func test_authoriseSessionID() async {
-        let session = SessionManager(sessionID: sessionID)
         do {
-            let sfa = try await session.authorizeSession()
-            print(sfa)
+            let session = SessionManager()
+            let (privKey, pubKey) = generatePrivateandPublicKey()
+            let sfa = SFAModel(publicKey: pubKey, privateKey: privKey)
+            let result = try await session.createSession(data: sfa)
+            let sfa2 = try await session.authorizeSession()
+            print(sfa2)
         } catch {
             XCTFail(error.localizedDescription)
         }
