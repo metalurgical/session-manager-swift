@@ -91,7 +91,7 @@ extension SessionManager {
         do {
             // AES-CBCblock-256
             let aes = try AES(key: encryptionKey, blockMode: CBC(iv: iv), padding: .pkcs7)
-            let encrypt = try aes.encrypt(msg.bytes)
+            let encrypt = try aes.encrypt(msg.web3.bytes)
             let data = Data(encrypt)
             let ciphertext = data
             var dataToMac: [UInt8] = iv
