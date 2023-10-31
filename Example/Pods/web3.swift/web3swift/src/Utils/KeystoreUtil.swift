@@ -25,11 +25,11 @@ class KeystoreUtil: KeystoreUtilProtocol {
     private static let dkround = 262144
 
     static func encode(privateKey: Data, password: String) throws -> Data {
-        guard let salt = Data.randomOfLength(16) else {
+        guard let salt = generateRandomData(length: 16) else {
             throw KeystoreUtilError.unknown
         }
 
-        guard let iv = Data.randomOfLength(16) else {
+        guard let iv = generateRandomData(length: 16) else {
             throw KeystoreUtilError.unknown
         }
 

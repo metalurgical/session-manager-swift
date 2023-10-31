@@ -13,7 +13,7 @@ public enum SessionManagerError: Error {
 extension SessionManagerError: LocalizedError {
     public var errorDescription: String? {
         switch self {
-        case .runtimeError(let msg):
+        case let .runtimeError(msg):
             return msg
         case .decodingError:
             return "Decoding error"
