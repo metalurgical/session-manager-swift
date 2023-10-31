@@ -46,7 +46,7 @@ public class SessionManager {
     }
 
     private func generateRandomSessionID() -> String? {
-        if let val = generateRandomData(length: 32)?.toHexString().padStart(toLength: 64, padString: "0") {
+        if let val = generatePrivateKeyData()?.toHexString().padStart(toLength: 64, padString: "0") {
             return val
         }
         return nil

@@ -10,7 +10,7 @@ final class SessionManagementTest: XCTestCase {
     var sessionID: String = "ab6fb847033ccb155769bcd1193d0da2096fb3419193725e5a48b7d40e65caa3"
 
     private func generatePrivateandPublicKey() -> (privKey: String, pubKey: String) {
-        let privKeyData = SECP256K1.generatePrivateKey()
+        let privKeyData = generatePrivateKeyData()
         var publicKey = SECP256K1.privateKeyToPublicKey(privateKey: privKeyData!)
         let serialized = SECP256K1.serializePublicKey(publicKey: &publicKey!, compressed: false)
         return (privKey: privKeyData!.toHexString(), pubKey: serialized!.toHexString())
