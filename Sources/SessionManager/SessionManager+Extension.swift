@@ -13,7 +13,7 @@ extension SessionManager {
     func decryptData(privKeyHex: String, d: String) throws -> [String: Any] {
         let ecies = try encParamsHexToBuf(encParamsHex: d)
         let result = try decrypt(privateKey: privKeyHex, opts: ecies)
-        guard let dict = try JSONSerialization.jsonObject(with: result.data(using: .utf8) ?? Data()) as? [String: Any] else { throw SessionManagerError.decodingError}
+        guard let dict = try JSONSerialization.jsonObject(with: result.data(using: .utf8) ?? Data()) as? [String: Any] else { throw SessionManagerError.decodingError }
 //              let loginDetails: T = dictionaryToStruct(dict) else { throw SessionManagerError.decodingError }
 //        return loginDetails
         return dict
@@ -61,8 +61,8 @@ extension SessionManager {
         }
     }
 
-   private func encrypt(publicKey: String, msg: String, opts: ECIES?) throws -> ECIES {
-        guard let ephemPrivateKey = SECP256K1.generatePrivateKey(), let ephemPublicKey = SECP256K1.privateToPublic(privateKey: ephemPrivateKey)
+    private func encrypt(publicKey: String, msg: String, opts: ECIES?) throws -> ECIES {
+        guard let ephemPrivateKey = generatePrivateKeyData(), let ephemPublicKey = SECP256K1.privateToPublic(privateKey: ephemPrivateKey)
         else {
             throw SessionManagerError.runtimeError("Private key generation failed")
         }
@@ -99,7 +99,7 @@ extension SessionManager {
             dataToMac.append(contentsOf: [UInt8](ciphertext.data))
             let mac = try? HMAC(key: macKey, variant: .sha2(.sha256)).authenticate(dataToMac)
             return .init(iv: iv.toHexString(), ephemPublicKey: ephemPublicKey.toHexString(),
-            ciphertext: ciphertext.toHexString(), mac: mac?.toHexString() ?? "")
+                         ciphertext: ciphertext.toHexString(), mac: mac?.toHexString() ?? "")
         } catch let err {
             throw err
         }

@@ -8,8 +8,12 @@ public func dictionaryToStruct<T: Decodable>(_ dictionary: [String: Any]) -> T? 
     return structObject
 }
 
+public func generateRandomData(length: Int) -> Data? {
+    return Data.randomOfLength(length)
+}
+
 public func generatePrivateKeyData() -> Data? {
-    return Data.randomOfLength(32)
+    return SECP256K1.generatePrivateKey()
 }
 
 func decodedBase64(_ base64URLSafe: String) -> Data? {
@@ -36,7 +40,7 @@ func array32toTuple(_ arr: [UInt8]) -> (UInt8, UInt8, UInt8, UInt8, UInt8, UInt8
 extension Array where Element == UInt8 {
     func uint8Reverse() -> Array {
         var revArr = [Element]()
-        for arrayIndex in stride(from: self.count - 1, through: 0, by: -1) {
+        for arrayIndex in stride(from: count - 1, through: 0, by: -1) {
             revArr.append(self[arrayIndex])
         }
         return revArr

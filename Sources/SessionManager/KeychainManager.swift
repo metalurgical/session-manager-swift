@@ -38,7 +38,7 @@ public class KeychainManager: KeychainManagerProtocol {
 
     private init() {}
 
-   public func get(key: KeychainConstantEnum) -> String? {
+    public func get(key: KeychainConstantEnum) -> String? {
         return keychain.get(key.value)
     }
 
