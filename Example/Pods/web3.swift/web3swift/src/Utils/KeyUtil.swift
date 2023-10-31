@@ -20,7 +20,7 @@ enum KeyUtilError: Error {
 
 class KeyUtil {
     static func generatePrivateKeyData() -> Data? {
-        return generatePrivateKeyData()
+        return Util.generatePrivateKeyData()
     }
 
     static func generatePublicKey(from privateKey: Data) throws -> Data {
