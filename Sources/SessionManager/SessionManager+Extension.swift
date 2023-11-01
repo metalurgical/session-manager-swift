@@ -4,7 +4,7 @@ import secp256k1
 
 extension SessionManager {
     func decryptData(privKey: secp256k1.KeyAgreement.PrivateKey, d: String) throws -> [String: Any] {
-        let ecies = try encParamsHexToBuf(encParamsHex: d)
+        let ecies = try ECIES(params: d)
         let result = try decrypt(privateKey: privKey.rawRepresentation.toHexString(), opts: ecies)
         guard let dict = try JSONSerialization.jsonObject(with: result.data(using: .utf8) ?? Data()) as? [String: Any] else { throw SessionManagerError.decodingError }
         return dict
@@ -16,38 +16,6 @@ extension SessionManager {
         let data = try JSONEncoder().encode(encParams)
         guard let string = String(data: data, encoding: .utf8) else { throw SessionManagerError.runtimeError("Invalid String from enc Params") }
         return string
-    }
-
-    private func encParamsBufToHex(encParamsHex: ECIES) throws -> ECIES {
-        guard let iv = encParamsHex.iv.web3.hexData?.web3.hexString,
-              let ephemPublicKey = encParamsHex.ephemPublicKey.web3.hexData?.toHexString(),
-              let ciphertext = encParamsHex.ciphertext.web3.hexData?.toHexString(),
-              let mac = encParamsHex.mac.web3.hexData?.web3.hexString else {
-            throw SessionManagerError.runtimeError("Invalid enc params")
-        }
-        return .init(iv: iv, ephemPublicKey: ephemPublicKey, ciphertext: ciphertext, mac: mac)
-    }
-
-    private func encParamsHexToBuf(encParamsHex: String) throws -> ECIES {
-        let data = encParamsHex.data(using: .utf8) ?? Data()
-        var arr = Array(repeating: "", count: 4)
-        do {
-            let dict = try JSONSerialization.jsonObject(with: data) as? [String: String]
-            dict?.forEach { key, value in
-                if key == "iv" {
-                    arr[0] = value
-                } else if key == "ephemPublicKey" {
-                    arr[1] = value
-                } else if key == "ciphertext" {
-                    arr[2] = value
-                } else if key == "mac" {
-                    arr[3] = value
-                }
-            }
-            return ECIES(iv: arr[0], ephemPublicKey: arr[1], ciphertext: arr[2], mac: arr[3])
-        } catch let error {
-            throw SessionManagerError.runtimeError(error.localizedDescription)
-        }
     }
 
     private func encrypt(publicKey: String, msg: String, opts: ECIES?) throws -> ECIES {
