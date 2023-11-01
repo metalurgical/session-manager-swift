@@ -60,7 +60,7 @@ public class SessionManager {
             let encodedObj = try JSONEncoder().encode(data)
             let jsonString = String(data: encodedObj, encoding: .utf8) ?? ""
             let encData = try encryptData(privkey: sessionID, jsonString)
-            let sig = try SECP256K1().sign(privkey: secp256k1.Signing.PrivateKey(dataRepresentation: sessionID.rawRepresentation, format: .uncompressed), messageData: encData)
+            let sig = try secp256k1.sign(privkey: secp256k1.Signing.PrivateKey(dataRepresentation: sessionID.rawRepresentation, format: .uncompressed), messageData: encData)
             let sigData = try JSONEncoder().encode(sig)
             let sigJsonStr = String(data: sigData, encoding: .utf8) ?? ""
             let sessionRequestModel = SessionRequestModel(key: publicKey.dataRepresentation.toHexString(), data: encData, signature: sigJsonStr, timeout: sessionTime)
@@ -110,7 +110,7 @@ public class SessionManager {
         do {
             let publicKey = sessionID.publicKey
             let encData = try encryptData(privkey: sessionID, "")
-            let sig = try SECP256K1().sign(privkey: secp256k1.Signing.PrivateKey(dataRepresentation: sessionID.rawRepresentation, format: .uncompressed), messageData: encData)
+            let sig = try secp256k1.sign(privkey: secp256k1.Signing.PrivateKey(dataRepresentation: sessionID.rawRepresentation, format: .uncompressed), messageData: encData)
             let sigData = try JSONEncoder().encode(sig)
             let sigJsonStr = String(data: sigData, encoding: .utf8) ?? ""
             let sessionLogoutDataModel = SessionRequestModel(key: publicKey.dataRepresentation.toHexString(), data: encData, signature: sigJsonStr, timeout: 1)
