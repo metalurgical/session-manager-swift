@@ -1,9 +1,3 @@
-//
-//  File.swift
-//
-//
-//  Created by Dhruv Jaiswal on 25/08/22.
-//
 import BigInt
 import Foundation
 import secp256k1

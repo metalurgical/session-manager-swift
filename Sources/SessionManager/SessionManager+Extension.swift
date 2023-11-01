@@ -1,10 +1,3 @@
-//
-//  SessionManagement+Extension.swift
-//  Web3Auth
-//
-//  Created by Dhruv Jaiswal on 03/10/22.
-//
-
 import CryptoSwift
 import Foundation
 import secp256k1
@@ -14,8 +7,6 @@ extension SessionManager {
         let ecies = try encParamsHexToBuf(encParamsHex: d)
         let result = try decrypt(privateKey: privKeyHex, opts: ecies)
         guard let dict = try JSONSerialization.jsonObject(with: result.data(using: .utf8) ?? Data()) as? [String: Any] else { throw SessionManagerError.decodingError }
-//              let loginDetails: T = dictionaryToStruct(dict) else { throw SessionManagerError.decodingError }
-//        return loginDetails
         return dict
     }
 

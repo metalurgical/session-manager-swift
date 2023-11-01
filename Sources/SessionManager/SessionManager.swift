@@ -1,9 +1,3 @@
-//
-//  File.swift
-//
-//
-//  Created by Dhruv Jaiswal on 18/07/22.
-//
 import BigInt
 import Foundation
 import OSLog
@@ -46,7 +40,7 @@ public class SessionManager {
     }
 
     private func generateRandomSessionID() -> String? {
-        if let val = generatePrivateKeyData()?.toHexString().padStart(toLength: 64, padString: "0") {
+        if let val = generatePrivateKeyData()?.toHexString().addLeading0sForLength64() {
             return val
         }
         return nil
