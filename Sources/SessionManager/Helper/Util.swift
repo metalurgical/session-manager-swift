@@ -1,11 +1,12 @@
 import Foundation
+import secp256k1
 
 public func generateRandomData(length: Int) -> Data? {
     return Data.randomOfLength(length)
 }
 
-public func generatePrivateKeyData() -> Data? {
-    return SECP256K1.generatePrivateKey()
+public func generatePrivateKey() throws -> secp256k1.KeyAgreement.PrivateKey {
+    return try secp256k1.KeyAgreement.PrivateKey(format: .uncompressed)
 }
 
 func tupleToArray(_ tuple: Any) -> [UInt8] {

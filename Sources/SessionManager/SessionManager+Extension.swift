@@ -7,6 +7,8 @@ extension SessionManager {
         let ecies = try encParamsHexToBuf(encParamsHex: d)
         let result = try decrypt(privateKey: privKeyHex, opts: ecies)
         guard let dict = try JSONSerialization.jsonObject(with: result.data(using: .utf8) ?? Data()) as? [String: Any] else { throw SessionManagerError.decodingError }
+//              let loginDetails: T = dictionaryToStruct(dict) else { throw SessionManagerError.decodingError }
+//        return loginDetails
         return dict
     }
 
@@ -53,7 +55,8 @@ extension SessionManager {
     }
 
     private func encrypt(publicKey: String, msg: String, opts: ECIES?) throws -> ECIES {
-        guard let ephemPrivateKey = generatePrivateKeyData(), let ephemPublicKey = SECP256K1.privateToPublic(privateKey: ephemPrivateKey)
+        let ephemPrivateKey = try generatePrivateKey()
+        guard let ephemPublicKey = SECP256K1.privateToPublic(privateKey: ephemPrivateKey.rawRepresentation)
         else {
             throw SessionManagerError.runtimeError("Private key generation failed")
         }
@@ -67,7 +70,7 @@ extension SessionManager {
         guard
             // Calculate g^a^b, i.e., Shared Key
             //  let data = inprivateKey
-            let sharedSecret = SECP256K1.ecdh(pubKey: ephemPubKey, privateKey: ephemPrivateKey)
+            let sharedSecret = SECP256K1.ecdh(pubKey: ephemPubKey, privateKey: ephemPrivateKey.rawRepresentation)
         else {
             throw SessionManagerError.runtimeError("ECDH error")
         }
