@@ -40,8 +40,8 @@ final class SessionManagementTest: XCTestCase {
         let dt = ["data": "data"]
         let dataToEncrypt = try JSONSerialization.data(withJSONObject: dt)
         let dataToEncryptStr = String(data: dataToEncrypt, encoding: .utf8)!
-        let encryptdata = try session.encryptData(privkeyHex: privKey.rawRepresentation.toHexString(), dataToEncryptStr)
-        let decrypted = try session.decryptData(privKeyHex: privKey.rawRepresentation.toHexString(), d: encryptdata)
+        let encryptdata = try session.encryptData(privkey: privKey, dataToEncryptStr)
+        let decrypted = try session.decryptData(privKey: privKey, d: encryptdata)
         let decryptedToString = String(data: try JSONSerialization.data(withJSONObject: decrypted), encoding: .utf8)!
         XCTAssertEqual(dataToEncryptStr, decryptedToString)
     }

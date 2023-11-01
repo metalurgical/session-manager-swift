@@ -3,20 +3,16 @@ import Foundation
 import secp256k1
 
 extension SessionManager {
-    func decryptData(privKeyHex: String, d: String) throws -> [String: Any] {
+    func decryptData(privKey: secp256k1.KeyAgreement.PrivateKey, d: String) throws -> [String: Any] {
         let ecies = try encParamsHexToBuf(encParamsHex: d)
-        let result = try decrypt(privateKey: privKeyHex, opts: ecies)
+        let result = try decrypt(privateKey: privKey.rawRepresentation.toHexString(), opts: ecies)
         guard let dict = try JSONSerialization.jsonObject(with: result.data(using: .utf8) ?? Data()) as? [String: Any] else { throw SessionManagerError.decodingError }
-//              let loginDetails: T = dictionaryToStruct(dict) else { throw SessionManagerError.decodingError }
-//        return loginDetails
         return dict
     }
 
-    func encryptData(privkeyHex: String, _ dataToEncrypt: String) throws -> String {
-        guard let pubKey = SECP256K1.privateToPublic(privateKey: privkeyHex.hexa.data)?.web3.hexString.web3.noHexPrefix else {
-            throw SessionManagerError.runtimeError("Invalid private key hex")
-        }
-        let encParams = try encrypt(publicKey: pubKey, msg: dataToEncrypt, opts: nil)
+    func encryptData(privkey: secp256k1.KeyAgreement.PrivateKey, _ dataToEncrypt: String) throws -> String {
+        let pubKey = privkey.publicKey
+        let encParams = try encrypt(publicKey: pubKey.dataRepresentation.toHexString().strip04Prefix(), msg: dataToEncrypt, opts: nil)
         let data = try JSONEncoder().encode(encParams)
         guard let string = String(data: data, encoding: .utf8) else { throw SessionManagerError.runtimeError("Invalid String from enc Params") }
         return string

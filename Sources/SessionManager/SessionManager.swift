@@ -59,7 +59,7 @@ public class SessionManager {
             let publicKey = sessionID.publicKey
             let encodedObj = try JSONEncoder().encode(data)
             let jsonString = String(data: encodedObj, encoding: .utf8) ?? ""
-            let encData = try encryptData(privkeyHex: sessionID.rawRepresentation.toHexString(), jsonString)
+            let encData = try encryptData(privkey: sessionID, jsonString)
             let sig = try SECP256K1().sign(privkey: secp256k1.Signing.PrivateKey(dataRepresentation: sessionID.rawRepresentation, format: .uncompressed), messageData: encData)
             let sigData = try JSONEncoder().encode(sig)
             let sigJsonStr = String(data: sigData, encoding: .utf8) ?? ""
@@ -92,7 +92,7 @@ public class SessionManager {
                 let msgDict = try JSONSerialization.jsonObject(with: data) as? [String: String]
                 let msgData = msgDict?["message"]
                 os_log("authrorize session response is: %@", log: getTorusLogger(log: Web3AuthLogger.network, type: .info), type: .info, "\(String(describing: msgDict))")
-                let loginDetails = try decryptData(privKeyHex: sessionID.rawRepresentation.toHexString(), d: msgData ?? "")
+                let loginDetails = try decryptData(privKey: sessionID, d: msgData ?? "")
                 KeychainManager.shared.save(key: .sessionID, val: sessionID.rawRepresentation.toHexString())
                 return loginDetails
             } catch {
@@ -109,7 +109,7 @@ public class SessionManager {
         }
         do {
             let publicKey = sessionID.publicKey
-            let encData = try encryptData(privkeyHex: sessionID.rawRepresentation.toHexString(), "")
+            let encData = try encryptData(privkey: sessionID, "")
             let sig = try SECP256K1().sign(privkey: secp256k1.Signing.PrivateKey(dataRepresentation: sessionID.rawRepresentation, format: .uncompressed), messageData: encData)
             let sigData = try JSONEncoder().encode(sig)
             let sigJsonStr = String(data: sigData, encoding: .utf8) ?? ""
