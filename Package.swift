@@ -12,7 +12,6 @@ let package = Package(
             targets: ["SessionManager"])
     ],
     dependencies: [
-        .package(name: "secp256k1", url: "https://github.com/GigaBitcoin/secp256k1.swift.git", .exact( "0.12.2")),
         .package(name: "KeychainSwift", url: "https://github.com/evgenyneu/keychain-swift.git", from: "20.0.0"),
         .package(name: "secp256k1", url: "https://github.com/GigaBitcoin/secp256k1.swift.git", .exact( "0.12.2")),
         .package(name: "CryptoSwift", url: "https://github.com/krzyzanowskim/CryptoSwift.git", from: "1.8.0"),
