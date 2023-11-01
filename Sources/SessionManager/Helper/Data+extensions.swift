@@ -20,6 +20,10 @@ extension Data {
     func addLeading0sForLength64() -> Data {
         Data(hex: toHexString().addLeading0sForLength64())
     }
+    
+    func toBytes() -> [UInt8] {
+        Array(self)
+    }
 
     static func randomOfLength(_ length: Int) -> Data? {
         var data = [UInt8](repeating: 0, count: length)

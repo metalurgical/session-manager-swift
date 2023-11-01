@@ -1,7 +1,6 @@
 import BigInt
 import Foundation
 import OSLog
-import web3
 import secp256k1
 
 public class SessionManager {

@@ -45,8 +45,11 @@ extension SessionManager {
         let macKey = Array(hash.suffix(32))
         do {
             // AES-CBCblock-256
+            guard let msgBytes: [UInt8] = msg.data(using: String.Encoding.utf8, allowLossyConversion: true)?.toBytes() else {
+                throw SessionManagerError.runtimeError("Cannot convert message to bytes when encrypting")
+            }
             let aes = try AES(key: encryptionKey, blockMode: CBC(iv: iv), padding: .pkcs7)
-            let encrypt = try aes.encrypt(msg.web3.bytes)
+            let encrypt = try aes.encrypt(msgBytes)
             let data = Data(encrypt)
             let ciphertext = data
             var dataToMac: [UInt8] = iv
