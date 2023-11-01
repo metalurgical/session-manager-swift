@@ -31,7 +31,7 @@ extension SessionManager {
         guard
             // Calculate g^a^b, i.e., Shared Key
             //  let data = inprivateKey
-            let sharedSecret = SECP256K1.ecdh(pubKey: ephemPubKey, privateKey: ephemPrivateKey.rawRepresentation)
+            let sharedSecret = secp256k1.ecdh(pubKey: ephemPubKey, privateKey: ephemPrivateKey.rawRepresentation)
         else {
             throw SessionManagerError.runtimeError("ECDH error")
         }
@@ -72,7 +72,7 @@ extension SessionManager {
         let data = privateKey.rawRepresentation
         guard
             // Calculate g^a^b, i.e., Shared Key
-            let sharedSecret = SECP256K1.ecdh(pubKey: ephemPubKey, privateKey: data)
+            let sharedSecret = secp256k1.ecdh(pubKey: ephemPubKey, privateKey: data)
         else {
             throw SessionManagerError.runtimeError("ECDH Error")
         }
