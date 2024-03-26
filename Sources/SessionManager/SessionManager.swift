@@ -1,14 +1,18 @@
 import BigInt
 import Foundation
 import OSLog
-import secp256k1
+import curveSecp256k1
 
 public class SessionManager {
     private var sessionServerBaseUrl = "https://broadcast-server.tor.us/"
-    private var sessionID: secp256k1.KeyAgreement.PrivateKey? {
+    private var sessionID: curveSecp256k1.SecretKey? {
         didSet {
-            if let sessionID = sessionID {
-                KeychainManager.shared.save(key: .sessionID, val: sessionID.rawRepresentation.toHexString())
+            do {
+                if let sessionID = sessionID {
+                    KeychainManager.shared.save(key: .sessionID, val: try sessionID.serialize())
+                }
+            } catch {
+                print("Error: Unknown error")
             }
         }
     }
@@ -16,27 +20,21 @@ public class SessionManager {
     private let sessionNamespace: String = ""
     private let sessionTime: Int
 
-    public func getSessionID() -> secp256k1.KeyAgreement.PrivateKey? {
+    public func getSessionID() ->curveSecp256k1.SecretKey? {
         return sessionID
     }
 
-    public func setSessionID(_ val: secp256k1.KeyAgreement.PrivateKey) {
+    public func setSessionID(_ val: curveSecp256k1.SecretKey) {
         sessionID = val
     }
     
     public init(sessionServerBaseUrl: String? = nil, sessionTime: Int = 86400, sessionID: String? = nil) throws {
         if let sessionID = sessionID {
-            guard let data = Data(hexString: sessionID) else {
-                throw SessionManagerError.runtimeError("Invalid sessionID")
-            }
-            let key = try secp256k1.KeyAgreement.PrivateKey(dataRepresentation: data, format: .uncompressed)
+            let key = try SecretKey.init(hex: sessionID)
             self.sessionID = key
         } else {
             if let sessionID = KeychainManager.shared.get(key: .sessionID) {
-                guard let data = Data(hexString: sessionID) else {
-                    throw SessionManagerError.runtimeError("Invalid sessionID")
-                }
-                self.sessionID = try secp256k1.KeyAgreement.PrivateKey(dataRepresentation: data, format: .uncompressed)
+                self.sessionID = try SecretKey.init(hex: sessionID)
             }
         }
         if let sessionServerBaseUrl = sessionServerBaseUrl {
@@ -46,30 +44,29 @@ public class SessionManager {
         Router.baseURL = self.sessionServerBaseUrl
     }
 
-    private func generateRandomSessionID() throws -> secp256k1.KeyAgreement.PrivateKey {
-        return try generatePrivateKey()
+    private func generateRandomSessionID() -> curveSecp256k1.SecretKey {
+        return generatePrivateKey()
     }
 
     public func createSession<T: Encodable>(data: T) async throws -> String {
         do {
-            let sessionID: secp256k1.KeyAgreement.PrivateKey
-            do { sessionID = try generateRandomSessionID() } catch (_) { throw SessionManagerError.sessionIDAbsent }
+            let sessionID = generateRandomSessionID()
             self.sessionID = sessionID
-            let publicKey = sessionID.publicKey
+            let publicKey = try sessionID.toPublic()
             let encodedObj = try JSONEncoder().encode(data)
             let jsonString = String(data: encodedObj, encoding: .utf8) ?? ""
             let encData = try encryptData(privkey: sessionID, jsonString)
-            let sig = try secp256k1.sign(privkey: secp256k1.Signing.PrivateKey(dataRepresentation: sessionID.rawRepresentation, format: .uncompressed), messageData: encData)
+            let sig = try curveSecp256k1.ECDSA.signRecoverable(key: sessionID, hash: encData).serialize()
             let sigData = try JSONEncoder().encode(sig)
             let sigJsonStr = String(data: sigData, encoding: .utf8) ?? ""
-            let sessionRequestModel = SessionRequestModel(key: publicKey.dataRepresentation.toHexString(), data: encData, signature: sigJsonStr, timeout: sessionTime)
+            let sessionRequestModel = SessionRequestModel(key: try publicKey.serialize(compressed: false), data: encData, signature: sigJsonStr, timeout: sessionTime)
             let api = Router.set(T: sessionRequestModel)
             let result = await Service.request(router: api)
             switch result {
             case let .success(data):
                 let msgDict = try JSONSerialization.jsonObject(with: data)
                 os_log("authrorize session response is: %@", log: getTorusLogger(log: Web3AuthLogger.network, type: .info), type: .info, "\(msgDict)")
-                return sessionID.rawRepresentation.toHexString()
+                return try sessionID.serialize()
             case let .failure(error):
                 throw error
             }
@@ -82,8 +79,8 @@ public class SessionManager {
         guard let sessionID = sessionID else {
             throw SessionManagerError.sessionIDAbsent
         }
-        let publicKey = sessionID.publicKey
-        let api = Router.get([.init(name: "key", value: "\(publicKey.dataRepresentation.toHexString())"), .init(name: "namespace", value: sessionNamespace)])
+        let publicKey = try sessionID.toPublic().serialize(compressed: false)
+        let api = Router.get([.init(name: "key", value: "\(publicKey)"), .init(name: "namespace", value: sessionNamespace)])
         let result = await Service.request(router: api)
         switch result {
         case let .success(data):
@@ -92,7 +89,7 @@ public class SessionManager {
                 let msgData = msgDict?["message"]
                 os_log("authrorize session response is: %@", log: getTorusLogger(log: Web3AuthLogger.network, type: .info), type: .info, "\(String(describing: msgDict))")
                 let loginDetails = try decryptData(privKey: sessionID, d: msgData ?? "")
-                KeychainManager.shared.save(key: .sessionID, val: sessionID.rawRepresentation.toHexString())
+                KeychainManager.shared.save(key: .sessionID, val: try sessionID.serialize())
                 return loginDetails
             } catch {
                 throw error
@@ -107,12 +104,12 @@ public class SessionManager {
             throw SessionManagerError.sessionIDAbsent
         }
         do {
-            let publicKey = sessionID.publicKey
+            let publicKey = try sessionID.toPublic()
             let encData = try encryptData(privkey: sessionID, "")
-            let sig = try secp256k1.sign(privkey: secp256k1.Signing.PrivateKey(dataRepresentation: sessionID.rawRepresentation, format: .uncompressed), messageData: encData)
+            let sig = try curveSecp256k1.ECDSA.signRecoverable(key: sessionID, hash: encData).serialize()
             let sigData = try JSONEncoder().encode(sig)
             let sigJsonStr = String(data: sigData, encoding: .utf8) ?? ""
-            let sessionLogoutDataModel = SessionRequestModel(key: publicKey.dataRepresentation.toHexString(), data: encData, signature: sigJsonStr, timeout: 1)
+            let sessionLogoutDataModel = SessionRequestModel(key: try publicKey.serialize(compressed: false), data: encData, signature: sigJsonStr, timeout: 1)
             let api = Router.set(T: sessionLogoutDataModel)
             let result = await Service.request(router: api)
             switch result {

@@ -1,40 +1,34 @@
 import CryptoSwift
 import Foundation
-import secp256k1
+import curveSecp256k1
 
 extension SessionManager {
-    func decryptData(privKey: secp256k1.KeyAgreement.PrivateKey, d: String) throws -> [String: Any] {
+    func decryptData(privKey: curveSecp256k1.SecretKey, d: String) throws -> [String: Any] {
         let ecies = try ECIES(params: d)
         let result = try decrypt(privateKey: privKey, opts: ecies)
         guard let dict = try JSONSerialization.jsonObject(with: result.data(using: .utf8) ?? Data()) as? [String: Any] else { throw SessionManagerError.decodingError }
         return dict
     }
 
-    func encryptData(privkey: secp256k1.KeyAgreement.PrivateKey, _ dataToEncrypt: String) throws -> String {
-        let pubKey = privkey.publicKey
+    func encryptData(privkey: curveSecp256k1.SecretKey, _ dataToEncrypt: String) throws -> String {
+        let pubKey = try privkey.toPublic()
         let encParams = try encrypt(publicKey: pubKey, msg: dataToEncrypt, opts: nil)
         let data = try JSONEncoder().encode(encParams)
         guard let string = String(data: data, encoding: .utf8) else { throw SessionManagerError.runtimeError("Invalid String from enc Params") }
         return string
     }
 
-    private func encrypt(publicKey: secp256k1.KeyAgreement.PublicKey, msg: String, opts: ECIES?) throws -> ECIES {
-        let ephemPrivateKey = try generatePrivateKey()
-        let ephemPublicKey = ephemPrivateKey.publicKey
-        let ephermalPublicKey = publicKey.dataRepresentation.toHexString().strip04Prefix()
+    private func encrypt(publicKey: curveSecp256k1.PublicKey, msg: String, opts: ECIES?) throws -> ECIES {
+        let ephemPrivateKey = generatePrivateKey()
+        let ephemPublicKey = try ephemPrivateKey.toPublic()
+        let ephermalPublicKey = try publicKey.serialize(compressed: false).strip04Prefix()
         let ephermalPublicKeyBytes = ephermalPublicKey.hexa
         var ephermOne = ephermalPublicKeyBytes.suffix(64).prefix(32)
         var ephermTwo = ephermalPublicKeyBytes.suffix(32)
         ephermOne.reverse(); ephermTwo.reverse()
         ephermOne.append(contentsOf: ephermTwo)
-        let ephemPubKey = secp256k1_pubkey.init(data: array32toTuple(Array(ephermOne)))
-        guard
-            // Calculate g^a^b, i.e., Shared Key
-            //  let data = inprivateKey
-            let sharedSecret = secp256k1.ecdh(pubKey: ephemPubKey, privateKey: ephemPrivateKey.rawRepresentation)
-        else {
-            throw SessionManagerError.runtimeError("ECDH error")
-        }
+        let ephemPubKey = try PublicKey(hex: Array(ephermOne).toHexString())
+        let sharedSecret = try curveSecp256k1.ECDH.ecdh(sk: ephemPrivateKey, pk: ephemPubKey)
 
         let sharedSecretData = sharedSecret.data
         let sharedSecretPrefix = Array(tupleToArray(sharedSecretData).prefix(32))
@@ -53,17 +47,17 @@ extension SessionManager {
             let data = Data(encrypt)
             let ciphertext = data
             var dataToMac: [UInt8] = iv
-            dataToMac.append(contentsOf: [UInt8](ephemPublicKey.dataRepresentation[1...64]))
+            dataToMac.append(contentsOf: [UInt8](try ephemPublicKey.serialize(compressed: false).bytes[1...64]))
             dataToMac.append(contentsOf: [UInt8](ciphertext.data))
             let mac = try? HMAC(key: macKey, variant: .sha2(.sha256)).authenticate(dataToMac)
-            return .init(iv: iv.toHexString(), ephemPublicKey: ephemPublicKey.dataRepresentation[1...64].toHexString(),
+            return .init(iv: iv.toHexString(), ephemPublicKey: try ephemPublicKey.serialize(compressed: false).strip04Prefix(),
                          ciphertext: ciphertext.toHexString(), mac: mac?.toHexString() ?? "")
         } catch let err {
             throw err
         }
     }
 
-    private func decrypt(privateKey: secp256k1.KeyAgreement.PrivateKey, opts: ECIES) throws -> String {
+    private func decrypt(privateKey: curveSecp256k1.SecretKey, opts: ECIES) throws -> String {
         var result: String = ""
         let ephermalPublicKey = opts.ephemPublicKey.strip04Prefix()
         let ephermalPublicKeyBytes = ephermalPublicKey.hexa
@@ -71,14 +65,8 @@ extension SessionManager {
         var ephermTwo = ephermalPublicKeyBytes.suffix(32)
         ephermOne.reverse(); ephermTwo.reverse()
         ephermOne.append(contentsOf: ephermTwo)
-        let ephemPubKey = secp256k1_pubkey.init(data: array32toTuple(Array(ephermOne)))
-        let data = privateKey.rawRepresentation
-        guard
-            // Calculate g^a^b, i.e., Shared Key
-            let sharedSecret = secp256k1.ecdh(pubKey: ephemPubKey, privateKey: data)
-        else {
-            throw SessionManagerError.runtimeError("ECDH Error")
-        }
+        let ephemPubKey = try PublicKey(hex: Array(ephermOne).toHexString())
+        let sharedSecret = try curveSecp256k1.ECDH.ecdh(sk: privateKey, pk: ephemPubKey)
         let sharedSecretData = sharedSecret.data
         let sharedSecretPrefix = Array(tupleToArray(sharedSecretData).prefix(32))
         let reversedSharedSecret = sharedSecretPrefix.uint8Reverse()
